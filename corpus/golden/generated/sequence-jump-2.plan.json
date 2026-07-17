@@ -1,0 +1,21 @@
+{
+  "status": "needs-confirmation",
+  "summary": {
+    "paragraphs": 8,
+    "numberedParagraphs": 8,
+    "numberingConversions": 8,
+    "crossReferencesConverted": 1,
+    "brokenReferences": 0,
+    "anomalies": 1
+  },
+  "anomalies": [
+    {
+      "code": "sequence-gap",
+      "paragraphIndex": 6,
+      "message": "Section sequence expected 2 but found 8.",
+      "oldNumber": "Section 1.08",
+      "proposedNumber": "Section 1.02"
+    }
+  ],
+  "warnings": []
+}

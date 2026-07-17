@@ -1,0 +1,13 @@
+{
+  "status": "blocked",
+  "summary": {
+    "paragraphs": 8,
+    "numberedParagraphs": 8,
+    "numberingConversions": 8,
+    "crossReferencesConverted": 2,
+    "brokenReferences": 0,
+    "anomalies": 0
+  },
+  "anomalies": [],
+  "warnings": []
+}

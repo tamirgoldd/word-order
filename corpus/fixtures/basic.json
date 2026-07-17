@@ -1,0 +1,12 @@
+{
+  "name": "basic-manual-numbering",
+  "paragraphs": [
+    { "text": "ARTICLE I General" },
+    { "text": "Section 1.01 Purpose" },
+    { "text": "(a) First obligation" },
+    { "text": "(i) First detail" },
+    { "text": "(ii) Second detail" },
+    { "text": "(b) Second obligation" },
+    { "text": "Section 1.02 Notices are governed by Section 1.01 and Section 9.99." }
+  ]
+}

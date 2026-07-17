@@ -1,0 +1,19 @@
+{
+  "status": "ready",
+  "summary": {
+    "paragraphs": 8,
+    "numberedParagraphs": 8,
+    "numberingConversions": 8,
+    "crossReferencesConverted": 0,
+    "brokenReferences": 1,
+    "anomalies": 0
+  },
+  "anomalies": [],
+  "warnings": [
+    {
+      "code": "broken-reference",
+      "paragraphIndex": 6,
+      "message": "No numbered paragraph resolves 8.2."
+    }
+  ]
+}

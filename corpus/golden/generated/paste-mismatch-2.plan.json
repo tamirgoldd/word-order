@@ -1,0 +1,35 @@
+{
+  "status": "needs-confirmation",
+  "summary": {
+    "paragraphs": 9,
+    "numberedParagraphs": 9,
+    "numberingConversions": 9,
+    "crossReferencesConverted": 2,
+    "brokenReferences": 0,
+    "anomalies": 3
+  },
+  "anomalies": [
+    {
+      "code": "parent-mismatch",
+      "paragraphIndex": 6,
+      "message": "Section 5.8 does not match its Article 1 parent.",
+      "oldNumber": "Section 5.08",
+      "proposedNumber": "Section 1.02"
+    },
+    {
+      "code": "sequence-gap",
+      "paragraphIndex": 7,
+      "message": "Section sequence expected 3 but found 2.",
+      "oldNumber": "Section 1.02",
+      "proposedNumber": "Section 1.03"
+    },
+    {
+      "code": "sequence-gap",
+      "paragraphIndex": 8,
+      "message": "Section sequence expected 4 but found 3.",
+      "oldNumber": "Section 1.03",
+      "proposedNumber": "Section 1.04"
+    }
+  ],
+  "warnings": []
+}

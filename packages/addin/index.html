@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#173f35" />
+    <title>Legal Down</title>
+  </head>
+  <body>
+    <header><span class="mark">LD</span><strong>Legal Down</strong><span class="local">LOCAL</span></header>
+    <main>
+      <section class="intro" id="intro">
+        <p class="eyebrow">Document repair</p>
+        <h1>Clean structure,<br />inside Word.</h1>
+        <p>Scan numbering and cross-references before changing anything.</p>
+      </section>
+      <div class="notice" id="status" role="status">Ready to scan the open document.</div>
+      <div id="results" hidden></div>
+      <section class="backup" id="backup" hidden>
+        <label><input type="checkbox" id="backup-check" /><span>I saved a backup copy and reviewed the flagged changes.</span></label>
+      </section>
+    </main>
+    <footer>
+      <button id="scan" class="secondary" type="button">Scan document</button>
+      <button id="apply" class="primary" type="button" hidden>Apply repair</button>
+    </footer>
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script type="module" src="/src/taskpane.ts"></script>
+  </body>
+</html>

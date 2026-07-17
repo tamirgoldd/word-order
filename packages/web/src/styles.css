@@ -1,0 +1,155 @@
+:root {
+  color: #17342d;
+  background: #f4f0e7;
+  font-family: "Avenir Next", Avenir, ui-sans-serif, system-ui, sans-serif;
+  font-synthesis: none;
+  --ink: #17342d;
+  --forest: #173f35;
+  --paper: #f4f0e7;
+  --cream: #fbf9f3;
+  --line: #cfc9bc;
+  --orange: #e15f38;
+  --mint: #bfdbc7;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--paper); }
+button, input { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+a { color: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid #f09b66; outline-offset: 3px; }
+
+.page-shell { min-height: 100vh; overflow: hidden; }
+.site-header, main, footer { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+.site-header { height: 86px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+.brand { display: inline-flex; gap: 11px; align-items: center; text-decoration: none; font-size: 18px; font-weight: 600; letter-spacing: -.02em; }
+.brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--forest); border-radius: 50%; font-family: "SFMono-Regular", Consolas, monospace; font-size: 11px; }
+nav { display: flex; gap: 32px; font-size: 14px; }
+nav a { text-decoration: none; }
+nav a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+.hero { min-height: 520px; display: grid; grid-template-columns: 1.5fr .75fr; gap: 70px; align-items: center; padding: 74px 4%; }
+.hero.compact { min-height: auto; grid-template-columns: 1fr; padding-block: 62px 40px; }
+.hero.compact .hero-copy { max-width: 880px; }
+.kicker, .eyebrow { text-transform: uppercase; letter-spacing: .14em; font-family: "SFMono-Regular", Consolas, monospace; font-size: 11px; font-weight: 500; }
+.kicker { display: flex; align-items: center; gap: 9px; }
+.kicker span { width: 7px; height: 7px; border-radius: 50%; background: #23825f; box-shadow: 0 0 0 4px #cce3d4; }
+h1 { margin: 24px 0 20px; font-family: "Iowan Old Style", Baskerville, Georgia, serif; font-size: clamp(58px, 7vw, 96px); line-height: .88; font-weight: 400; letter-spacing: -.045em; }
+h1 em { color: var(--orange); font-weight: 400; }
+.lede { max-width: 670px; font-size: 18px; line-height: 1.65; color: #496159; }
+.privacy-proof { display: flex; gap: 22px; margin-top: 32px; flex-wrap: wrap; }
+.privacy-proof span { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; }
+.privacy-proof i { color: #71847d; font-family: "SFMono-Regular", Consolas, monospace; font-size: 9px; font-style: normal; }
+
+.document-motif { position: relative; height: 320px; }
+.paper { position: absolute; inset: 0 18px 0 0; padding: 55px 42px; display: flex; flex-direction: column; gap: 19px; background: #fffdf8; box-shadow: 0 22px 50px #2941391b; border: 1px solid #dcd6ca; transform: rotate(2deg); font-family: Georgia, serif; color: #3c4641; }
+.paper.back { transform: rotate(-7deg) translate(-17px, 7px); background: #e7e2d7; }
+.paper b { font-size: 14px; letter-spacing: .08em; }
+.paper span { padding-bottom: 8px; border-bottom: 1px solid #ddd6c8; }
+.paper .broken-line { color: var(--orange); text-decoration: line-through; transform: translateX(20px); }
+.paper i { position: absolute; right: 24px; bottom: 24px; padding: 8px 10px; background: var(--mint); font-family: "SFMono-Regular", Consolas, monospace; font-size: 10px; font-style: normal; }
+
+.workspace { position: relative; margin-bottom: 110px; }
+.dropzone { min-height: 390px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 48px 24px; background: var(--forest); color: #f9f5ea; border-radius: 3px; box-shadow: 0 30px 80px #183a2f2b; transition: transform .2s, background .2s; }
+.dropzone.dragging { transform: scale(1.01); background: #205144; }
+.dropzone input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.upload-glyph { width: 66px; height: 82px; display: grid; place-items: center; position: relative; margin-bottom: 20px; border: 1px solid #92b0a3; font: 500 11px "SFMono-Regular", Consolas, monospace; }
+.upload-glyph::after { content: ""; position: absolute; top: -1px; right: -1px; border-style: solid; border-width: 0 18px 18px 0; border-color: transparent var(--forest) transparent transparent; }
+.upload-glyph span { position: absolute; display: grid; place-items: center; right: -14px; bottom: -10px; width: 30px; height: 30px; background: var(--orange); color: white; border-radius: 50%; font-size: 18px; }
+.dropzone h2 { margin: 0 0 8px; font: 400 clamp(30px, 4vw, 44px) "Iowan Old Style", Baskerville, Georgia, serif; }
+.dropzone p { margin: 0 0 28px; color: #bdcec6; }
+.dropzone small { margin-top: 20px; color: #92aaa0; }
+.primary { min-height: 50px; padding: 0 25px; border: 0; background: var(--orange); color: #fff; cursor: pointer; font-weight: 600; box-shadow: inset 0 -2px #a53e24; transition: transform .15s, filter .15s; }
+.primary:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.05); }
+.primary:disabled { opacity: .55; cursor: not-allowed; }
+
+.review-workspace { background: #fffdf8; border: 1px solid var(--line); box-shadow: 0 25px 70px #203f3520; }
+.file-bar { min-height: 86px; padding: 16px 24px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; border-bottom: 1px solid var(--line); }
+.file-icon { width: 42px; height: 50px; display: grid; place-items: center; background: #245a9c; color: white; font-family: Georgia, serif; }
+.file-bar strong, .file-bar span { display: block; }
+.file-bar strong { max-width: min(60vw, 600px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-bar span { margin-top: 4px; color: #6f7e78; font-size: 12px; }
+.text-button { border: 0; background: none; cursor: pointer; color: var(--forest); text-decoration: underline; text-underline-offset: 4px; }
+.summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); }
+.stat { padding: 28px 30px; border-right: 1px solid var(--line); }
+.stat:last-child { border-right: 0; }
+.stat strong, .stat span { display: block; }
+.stat strong { font: 400 48px "Iowan Old Style", Baskerville, Georgia, serif; }
+.stat span { margin-top: 4px; color: #60736b; font-size: 12px; }
+.warning-stat strong { color: var(--orange); }
+.plan-sections { padding: 32px; display: grid; gap: 24px; }
+.review-card { border: 1px solid var(--line); background: #fff; }
+.section-heading { padding: 22px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e4dfd5; }
+.section-heading h3 { margin: 6px 0 0; font: 400 24px "Iowan Old Style", Baskerville, Georgia, serif; }
+.count { display: grid; place-items: center; min-width: 35px; height: 35px; padding: 0 9px; border-radius: 99px; background: #e8eee9; font: 500 11px "SFMono-Regular", Consolas, monospace; }
+.change-list, .reference-list { padding: 6px 24px; }
+.change-row { min-height: 57px; display: grid; grid-template-columns: 110px 30px 130px 1fr auto; align-items: center; gap: 10px; border-bottom: 1px solid #ece8df; }
+.change-row:last-child, .reference-row:last-child { border-bottom: 0; }
+code { font-family: "SFMono-Regular", Consolas, monospace; font-size: 12px; }
+.old-number { color: #8a6d63; text-decoration: line-through; }
+.new-number { color: #126348; font-weight: 500; }
+.arrow { color: #9baaa4; }
+.preview { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #546961; font-size: 13px; }
+.confidence { padding: 4px 7px; background: #e1eee5; color: #2a6e54; border-radius: 2px; font: 9px "SFMono-Regular", Consolas, monospace; text-transform: uppercase; }
+.confidence.review { background: #f5dfd3; color: #9e3f25; }
+.more { margin: 0; padding: 14px 24px; border-top: 1px solid #e4dfd5; color: #6e7d77; font-size: 12px; }
+.reference-row { min-height: 52px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; border-bottom: 1px solid #ece8df; font-size: 13px; }
+.reference-row small { color: #84918c; font-family: "SFMono-Regular", Consolas, monospace; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; }
+.status-dot.resolved { background: #29805e; box-shadow: 0 0 0 4px #dcece2; }
+.status-dot.unresolved { background: var(--orange); box-shadow: 0 0 0 4px #f5ded5; }
+.anomaly-card { border-color: #dc8f75; background: #fffaf6; }
+.anomaly { padding: 18px 24px; display: grid; grid-template-columns: 70px 1fr auto; gap: 12px; align-items: center; border-bottom: 1px solid #efded6; }
+.anomaly:last-child { border-bottom: 0; }
+.anomaly span { color: var(--orange); font: 11px "SFMono-Regular", Consolas, monospace; }
+.anomaly p { margin: 0; }
+.anomaly code { padding: 7px 9px; background: #f7e5dc; }
+.apply-bar { min-height: 100px; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; gap: 24px; background: #edf1eb; border-top: 1px solid var(--line); }
+.apply-bar p { margin: 0; font-size: 13px; line-height: 1.5; }
+.confirmation { display: flex; align-items: flex-start; gap: 10px; max-width: 650px; font-size: 13px; line-height: 1.5; cursor: pointer; }
+.confirmation input { width: 18px; height: 18px; margin-top: 1px; accent-color: var(--forest); }
+.download-button { min-width: 210px; }
+.blocking-message, .clean-message { margin: 32px; padding: 24px; background: #f7e2d9; border-left: 4px solid var(--orange); }
+.blocking-message p { margin: 8px 0 0; }
+.clean-message { display: flex; gap: 12px; background: #dfede3; border-color: #27805d; }
+.error-message { margin-top: 16px; padding: 16px 20px; background: #f4dcd3; border: 1px solid #db9177; color: #82351f; }
+
+.how { padding: 20px 4% 110px; display: grid; grid-template-columns: .8fr 1.3fr; gap: 100px; }
+.how h2 { margin: 14px 0 0; font: 400 clamp(38px, 5vw, 58px)/1.03 "Iowan Old Style", Baskerville, Georgia, serif; }
+.principles { border-top: 1px solid var(--line); }
+.principles article { display: grid; grid-template-columns: 40px 120px 1fr; gap: 20px; padding: 24px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.principles article > span { font: 11px "SFMono-Regular", Consolas, monospace; color: var(--orange); }
+.principles h3, .principles p { margin: 0; }
+.principles h3 { font: 400 25px "Iowan Old Style", Baskerville, Georgia, serif; }
+.principles p { color: #5c7068; line-height: 1.55; }
+.faq { max-width: 850px; margin: 0 auto 120px; }
+.faq > .eyebrow { display: block; margin-bottom: 15px; }
+.faq details { border-top: 1px solid var(--line); padding: 22px 0; }
+.faq details:last-child { border-bottom: 1px solid var(--line); }
+.faq summary { cursor: pointer; font: 400 24px "Iowan Old Style", Baskerville, Georgia, serif; }
+.faq p { max-width: 720px; color: #50665e; line-height: 1.65; }
+footer { min-height: 100px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; color: #61736d; font-size: 12px; }
+
+@media (max-width: 800px) {
+  .site-header, main, footer { width: min(100% - 28px, 1180px); }
+  nav a:first-child { display: none; }
+  .hero { grid-template-columns: 1fr; min-height: auto; padding: 60px 0; }
+  .document-motif { display: none; }
+  h1 { font-size: clamp(54px, 16vw, 78px); }
+  .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat:nth-child(2) { border-right: 0; }
+  .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .plan-sections { padding: 14px; }
+  .change-row { grid-template-columns: 85px 20px 100px auto; padding: 10px 0; }
+  .preview { grid-column: 1 / -1; }
+  .anomaly { grid-template-columns: 1fr; }
+  .apply-bar { align-items: stretch; flex-direction: column; }
+  .how { grid-template-columns: 1fr; gap: 50px; padding-inline: 0; }
+  .principles article { grid-template-columns: 28px 90px 1fr; gap: 10px; }
+  footer { padding: 25px 0; gap: 15px; align-items: flex-start; flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+}
