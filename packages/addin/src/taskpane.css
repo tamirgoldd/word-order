@@ -16,7 +16,7 @@ h1 { margin: 13px 0; font: 400 38px/1 "Iowan Old Style", Baskerville, Georgia, s
 .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); border: 1px solid #d2ccbf; background: #fff; }
 .stat { padding: 14px; border-right: 1px solid #e2ddd3; border-bottom: 1px solid #e2ddd3; }
 .stat:nth-child(even) { border-right: 0; }
-.stat:nth-child(n+3) { border-bottom: 0; }
+.stat:nth-child(n+5) { border-bottom: 0; }
 .stat strong, .stat span { display: block; }
 .stat strong { font: 400 30px "Iowan Old Style", Baskerville, Georgia, serif; }
 .stat span { color: #61756d; font-size: 10px; }

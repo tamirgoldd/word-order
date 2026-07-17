@@ -7,6 +7,7 @@ import type {
   SchemeProfile,
   TokenKind
 } from "./types.js";
+import { isFlatSectionHeading } from "./formatting.js";
 import { numberToLetters, numberToRoman, romanToNumber } from "./tokens.js";
 
 interface StructuralState {
@@ -27,13 +28,19 @@ export function inferProfile(inventory: ParagraphInventory[]): SchemeProfile {
   const manual = inventory.flatMap((paragraph) => paragraph.manual ? [paragraph.manual] : []);
   const articles = manual.filter((token) => token.kind === "article");
   const sections = manual.filter((token) => token.kind === "section" || token.kind === "decimal");
+  const flatSectionHeadings = inventory.filter(isFlatSectionHeading);
+  const nativeFlatSections = inventory.filter((paragraph) => paragraph.native?.level === 0 && paragraph.styleId === "LDSection");
+  const topLevelKind = articles.length === 0 && sections.length === 0 && (flatSectionHeadings.length >= 2 || nativeFlatSections.length > 0)
+    ? "flat-section" as const
+    : "article" as const;
   const indents = [0, 720, 1440, 2160].map((fallback, level) => {
     const values = inventory
-      .filter((paragraph) => tokenLevel(paragraph.manual) === level || paragraph.native?.level === level)
+      .filter((paragraph) => effectiveLevel(paragraph, topLevelKind) === level || paragraph.native?.level === level)
       .flatMap((paragraph) => paragraph.indentLeft === null ? [] : [paragraph.indentLeft]);
     return mostFrequent(values, fallback);
   });
   return {
+    topLevelKind,
     articleLabel: mostFrequent(articles.map((token) => token.label === "Article" ? "Article" as const : "ARTICLE" as const), "ARTICLE"),
     articleFormat: mostFrequent(articles.map((token) => /^\d+$/.test(token.raw.replace(/\D/g, "")) ? "decimal" as const : "upperRoman" as const), "upperRoman"),
     sectionLabel: mostFrequent(sections.map((token) => token.kind === "decimal" ? "none" as const : token.label === "section" ? "section" as const : "Section" as const), "Section"),
@@ -41,6 +48,11 @@ export function inferProfile(inventory: ParagraphInventory[]): SchemeProfile {
     sectionSeparator: ".",
     levelIndents: indents
   };
+}
+
+function effectiveLevel(paragraph: ParagraphInventory, topLevelKind: SchemeProfile["topLevelKind"]): number | null {
+  if (topLevelKind === "flat-section" && isFlatSectionHeading(paragraph)) return 0;
+  return tokenLevel(paragraph.manual) ?? nativeLevel(paragraph);
 }
 
 export function tokenLevel(token: ManualToken | null): number | null {
@@ -107,13 +119,15 @@ function stripLabel(number: string): string {
 }
 
 function canonicalSection(number: string): string {
-  const match = stripLabel(number).match(/^(\d+(?:\.\d+)*)(.*)$/);
-  if (!match) return stripLabel(number).toLowerCase();
+  const stripped = stripLabel(number).replace(/\.$/, "");
+  const match = stripped.match(/^(\d+(?:\.\d+)*)(.*)$/);
+  if (!match) return stripped.toLowerCase();
   const components = (match[1] ?? "").split(".").map((part) => String(Number(part))).join(".");
   return `${components}${(match[2] ?? "").toLowerCase()}`;
 }
 
-function semanticKey(level: number, number: string, state: StructuralState): string {
+function semanticKey(level: number, number: string, state: StructuralState, profile: SchemeProfile): string {
+  if (level === 0 && profile.topLevelKind === "flat-section") return `section:${canonicalSection(number)}`;
   if (level === 0) return `article:${romanToNumber(stripLabel(number)) || stripLabel(number)}`;
   if (level === 1) return `section:${canonicalSection(number)}`;
   const base = state.sectionComponents ? `section:${state.sectionComponents.join(".")}` : "clause";
@@ -137,7 +151,7 @@ export function inferNumbering(
   const state: StructuralState = { article: null, sectionComponents: null, sectionParentArticle: null, letter: null, roman: null };
 
   for (const paragraph of inventory) {
-    const level = tokenLevel(paragraph.manual) ?? nativeLevel(paragraph);
+    const level = effectiveLevel(paragraph, profile.topLevelKind);
     if (paragraph.manual?.kind === "ambiguous-i") {
       anomalies.push({
         code: "ambiguous-token",
@@ -162,14 +176,15 @@ export function inferNumbering(
       proposedOrdinal = expected;
       if (actual !== expected) {
         anomalyCode = "sequence-gap";
-        anomalyMessage = `Article sequence jumps from ${state.article ?? "the start"} to ${actual}.`;
+        const label = profile.topLevelKind === "flat-section" ? "Section" : "Article";
+        anomalyMessage = `${label} sequence jumps from ${state.article ?? "the start"} to ${actual}.`;
       }
       state.article = expected;
       state.sectionComponents = null;
       state.sectionParentArticle = expected;
       state.letter = null;
       state.roman = null;
-      newNumber = formatArticle(expected, profile);
+      newNumber = profile.topLevelKind === "flat-section" ? `${expected}.` : formatArticle(expected, profile);
     } else if (level === 1) {
       const actual = actualComponents(paragraph);
       const components = [...actual];
@@ -217,7 +232,7 @@ export function inferNumbering(
     }
 
     const bookmarkName = `_LDRef_${paragraph.index + 1}`;
-    const key = semanticKey(level, newNumber, state);
+    const key = semanticKey(level, newNumber, state, profile);
     targets.push({ paragraphIndex: paragraph.index, level, number: newNumber, bookmarkName, semanticKey: key });
 
     if (anomalyCode) {

@@ -1,4 +1,5 @@
 import { LegalDownError } from "./errors.js";
+import { analyzeFormatting, LEGAL_FORMATTING_PROFILE } from "./formatting.js";
 import { inferNumbering, inferProfile } from "./infer.js";
 import { inventoryDocument } from "./inventory.js";
 import { fingerprint, loadDocx } from "./package.js";
@@ -15,6 +16,7 @@ export async function createRepairPlan(bytes: Uint8Array): Promise<RepairPlan> {
   const inventory = inventoryDocument(docx.documentXml, docx.numberingXml);
   const profile = inferProfile(inventory);
   const inference = inferNumbering(inventory, profile);
+  const formatting = analyzeFormatting(docx.documentXml, inventory, inference.targets, LEGAL_FORMATTING_PROFILE);
   return buildRepairPlan({
     sourceFingerprint: fingerprint(bytes),
     inventory,
@@ -22,6 +24,9 @@ export async function createRepairPlan(bytes: Uint8Array): Promise<RepairPlan> {
     targets: inference.targets,
     numbering: inference.changes,
     anomalies: inference.anomalies,
+    formattingProfile: LEGAL_FORMATTING_PROFILE,
+    formatting: formatting.changes,
+    formattingWarnings: formatting.warnings,
     trackedChanges: docx.hasTrackedChanges
   });
 }

@@ -81,6 +81,59 @@ describe("repair planning", () => {
 });
 
 describe("OOXML rebuild", () => {
+  it("normalizes chaotic legal formatting and repairs flat section numbering without rewriting prose", async () => {
+    const input = await createSyntheticDocx([
+      { text: "SERVICES agreement" },
+      { text: "(the \"Agreement\")" },
+      { text: "This agreement is between ACME HOLDINGS, LLC and the Provider." },
+      { text: "1.  DEFINITIONS" },
+      { text: "A short body paragraph governed by Section 1." },
+      { text: "3.  payment terms" },
+      { text: "Company shall pay $[AMOUNT] within thirty days." },
+      { text: "3.  Term and Termination" },
+      { text: "Either party may terminate on written notice." },
+      { text: "2.  CONFIDENTIALITY" },
+      { text: `The Provider acknowledges that confidential information must remain protected and agrees not to disclose it to any third party and this obligation continues after termination and applies to all business records and materials and the Provider must use reasonable safeguards and notify the Company promptly of any suspected breach or unauthorized disclosure and must cooperate fully with every investigation and remediation effort requested by the Company.` },
+      { text: "Company: _______________________" }
+    ]);
+    const zip = await JSZip.loadAsync(input);
+    let document = await zip.file("word/document.xml")?.async("string") ?? "";
+    document = document
+      .replace("<w:p><w:r><w:t xml:space=\"preserve\">SERVICES agreement</w:t></w:r></w:p>", "<w:p><w:pPr><w:jc w:val=\"left\"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Comic Sans MS\"/><w:b/><w:sz w:val=\"56\"/></w:rPr><w:t xml:space=\"preserve\">SERVICES agreement</w:t></w:r></w:p>")
+      .replace("<w:p><w:r><w:t xml:space=\"preserve\">This agreement is between ACME HOLDINGS, LLC and the Provider.</w:t></w:r></w:p>", "<w:p><w:r><w:rPr><w:rFonts w:ascii=\"Arial\"/><w:sz w:val=\"18\"/><w:i/></w:rPr><w:t xml:space=\"preserve\">This agreement is between ACME HOLDINGS, LLC and the Provider.</w:t></w:r></w:p>")
+      .replace("<w:p><w:r><w:t xml:space=\"preserve\">A short body paragraph governed by Section 1.</w:t></w:r></w:p>", "<w:p><w:pPr><w:ind w:left=\"1400\"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Georgia\"/><w:sz w:val=\"28\"/><w:u w:val=\"single\"/></w:rPr><w:t xml:space=\"preserve\">A short body paragraph governed by Section 1.</w:t></w:r></w:p>")
+      .replace("<w:p><w:r><w:t xml:space=\"preserve\">Company shall pay $[AMOUNT] within thirty days.</w:t></w:r></w:p>", "<w:p><w:pPr><w:jc w:val=\"center\"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Courier New\"/><w:sz w:val=\"30\"/><w:highlight w:val=\"yellow\"/></w:rPr><w:t xml:space=\"preserve\">Company shall pay $[AMOUNT] within thirty days.</w:t></w:r></w:p>")
+      .replace("<w:sectPr/>", "<w:sectPr><w:pgMar w:top=\"400\" w:right=\"2200\" w:bottom=\"1600\" w:left=\"500\"/></w:sectPr>");
+    zip.file("word/document.xml", document);
+    const broken = await zip.generateAsync({ type: "uint8array", compression: "DEFLATE" });
+
+    const plan = await createRepairPlan(broken);
+    expect(plan.profile.topLevelKind).toBe("flat-section");
+    expect(plan.numbering.map((change) => change.newNumber)).toEqual(["1.", "2.", "3.", "4."]);
+    expect(plan.crossReferences.find((reference) => reference.display === "1")?.status).toBe("resolved");
+    expect([...new Set(plan.formatting.map((change) => change.category))]).toEqual(expect.arrayContaining(["font-family", "font-size", "alignment", "indent", "highlight", "margins"]));
+    expect(plan.warnings.some((warning) => warning.code === "long-paragraph")).toBe(true);
+
+    const repaired = await repairDocument(broken, plan, { allowAnomalies: true });
+    const output = await JSZip.loadAsync(repaired.bytes);
+    const outputDocument = await output.file("word/document.xml")?.async("string") ?? "";
+    const outputStyles = await output.file("word/styles.xml")?.async("string") ?? "";
+    const outputNumbering = await output.file("word/numbering.xml")?.async("string") ?? "";
+    expect(outputDocument).not.toMatch(/Comic Sans|Arial|Georgia|Courier New|<w:highlight\b/);
+    expect(outputDocument).toContain('w:pStyle w:val="LDTitle"');
+    expect(outputDocument).toContain('w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"');
+    expect(outputStyles).toContain('w:styleId="LDBody"');
+    expect(outputNumbering).toContain('w:lvlText w:val="%1."');
+    expect((await compareTextModuloNumberTokens(broken, repaired.bytes)).equal).toBe(true);
+
+    const secondPlan = await createRepairPlan(repaired.bytes);
+    const second = await repairDocument(repaired.bytes, secondPlan);
+    expect(secondPlan.status).toBe("clean");
+    expect(secondPlan.numbering).toHaveLength(0);
+    expect(secondPlan.formatting).toHaveLength(0);
+    expect(second.changed).toBe(false);
+  });
+
   it("emits native numbering, REF fields, bookmarks, styles, and updateFields", async () => {
     const input = await createSyntheticDocx(basicParagraphs);
     const plan = await createRepairPlan(input);

@@ -12,7 +12,7 @@ interface Arguments {
   force: boolean;
 }
 
-const USAGE = `Legal Down — repair legal Word numbering locally
+const USAGE = `Legal Down — repair legal Word structure and formatting locally
 
 Usage:
   legal-down scan <input.docx> [--report plan.json]
@@ -49,7 +49,7 @@ function parseArguments(args: string[]): Arguments {
 function humanPlan(plan: RepairPlan): string {
   const lines = [
     `${plan.status.toUpperCase()} — ${plan.summary.paragraphs} paragraphs scanned`,
-    `${plan.summary.numberingConversions} numbering conversions; ${plan.summary.crossReferencesConverted} live references; ${plan.summary.brokenReferences} broken references; ${plan.summary.anomalies} anomalies`
+    `${plan.summary.numberingConversions} numbering conversions; ${plan.formatting.length} formatting repairs; ${plan.summary.crossReferencesConverted} live references; ${plan.summary.brokenReferences} broken references; ${plan.summary.anomalies} anomalies`
   ];
   if (plan.blockedReason) lines.push(`\nBlocked: ${plan.blockedReason}`);
   if (plan.anomalies.length) {

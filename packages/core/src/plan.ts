@@ -1,5 +1,7 @@
 import type {
   CrossReferencePlan,
+  FormattingChange,
+  FormattingProfile,
   NumberedTarget,
   ParagraphInventory,
   PlanWarning,
@@ -14,12 +16,16 @@ interface PlanInputs {
   targets: NumberedTarget[];
   numbering: RepairPlan["numbering"];
   anomalies: RepairPlan["anomalies"];
+  formattingProfile: FormattingProfile;
+  formatting: FormattingChange[];
+  formattingWarnings: PlanWarning[];
   trackedChanges: boolean;
 }
 
 function canonicalSection(value: string): string {
-  const match = value.match(/^(\d+(?:\.\d+)*)(.*)$/);
-  if (!match) return value.toLowerCase();
+  const stripped = value.replace(/\.$/, "");
+  const match = stripped.match(/^(\d+(?:\.\d+)*)(.*)$/);
+  if (!match) return stripped.toLowerCase();
   const numbers = (match[1] ?? "").split(".").map((part) => String(Number(part))).join(".");
   return `${numbers}${(match[2] ?? "").toLowerCase()}`;
 }
@@ -45,7 +51,8 @@ function targetIndex(inputs: PlanInputs): Map<string, NumberedTarget> {
     const change = changes.get(target.paragraphIndex);
     if (!change) continue;
     const old = change.oldNumber.replace(/^(?:ARTICLE|Article|Section|section)\s+/, "");
-    if (target.level === 0) result.set(`article:${canonicalArticle(old)}`, target);
+    if (target.level === 0 && inputs.profile.topLevelKind === "flat-section") result.set(`section:${canonicalSection(old)}`, target);
+    else if (target.level === 0) result.set(`article:${canonicalArticle(old)}`, target);
     if (target.level >= 1) result.set(`section:${canonicalSection(old)}`, target);
   }
   return result;
@@ -55,7 +62,7 @@ function paragraphSectionByIndex(inputs: PlanInputs): Map<number, string> {
   const sections = new Map<number, string>();
   let current = "";
   for (const target of inputs.targets) {
-    if (target.level === 1) current = target.semanticKey;
+    if (target.semanticKey.startsWith("section:")) current = target.semanticKey;
     sections.set(target.paragraphIndex, current);
   }
   let latest = "";
@@ -147,13 +154,14 @@ function detectReferences(inputs: PlanInputs): { references: CrossReferencePlan[
 }
 
 export function buildRepairPlan(inputs: PlanInputs): RepairPlan {
-  const { references, warnings } = detectReferences(inputs);
+  const { references, warnings: referenceWarnings } = detectReferences(inputs);
+  const warnings = [...referenceWarnings, ...inputs.formattingWarnings];
   const resolved = references.filter((reference) => reference.status === "resolved");
   const status = inputs.trackedChanges
     ? "blocked"
     : inputs.anomalies.length > 0
       ? "needs-confirmation"
-      : inputs.numbering.length > 0 || resolved.length > 0
+      : inputs.numbering.length > 0 || resolved.length > 0 || inputs.formatting.length > 0
         ? "ready"
         : "clean";
   return {
@@ -164,10 +172,12 @@ export function buildRepairPlan(inputs: PlanInputs): RepairPlan {
       ? "Tracked changes are present. Accept or reject all changes in Word before scanning again."
       : null,
     profile: inputs.profile,
+    formattingProfile: inputs.formattingProfile,
     inventory: inputs.inventory,
     targets: inputs.targets,
     numbering: inputs.numbering,
     crossReferences: references,
+    formatting: inputs.formatting,
     anomalies: inputs.anomalies,
     warnings,
     summary: {

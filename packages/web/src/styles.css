@@ -71,7 +71,7 @@ h1 em { color: var(--orange); font-weight: 400; }
 .file-bar strong { max-width: min(60vw, 600px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .file-bar span { margin-top: 4px; color: #6f7e78; font-size: 12px; }
 .text-button { border: 0; background: none; cursor: pointer; color: var(--forest); text-decoration: underline; text-underline-offset: 4px; }
-.summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); }
+.summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); border-bottom: 1px solid var(--line); }
 .stat { padding: 28px 30px; border-right: 1px solid var(--line); }
 .stat:last-child { border-right: 0; }
 .stat strong, .stat span { display: block; }
@@ -83,7 +83,7 @@ h1 em { color: var(--orange); font-weight: 400; }
 .section-heading { padding: 22px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e4dfd5; }
 .section-heading h3 { margin: 6px 0 0; font: 400 24px "Iowan Old Style", Baskerville, Georgia, serif; }
 .count { display: grid; place-items: center; min-width: 35px; height: 35px; padding: 0 9px; border-radius: 99px; background: #e8eee9; font: 500 11px "SFMono-Regular", Consolas, monospace; }
-.change-list, .reference-list { padding: 6px 24px; }
+.change-list, .reference-list, .formatting-list { padding: 6px 24px; }
 .change-row { min-height: 57px; display: grid; grid-template-columns: 110px 30px 130px 1fr auto; align-items: center; gap: 10px; border-bottom: 1px solid #ece8df; }
 .change-row:last-child, .reference-row:last-child { border-bottom: 0; }
 code { font-family: "SFMono-Regular", Consolas, monospace; font-size: 12px; }
@@ -96,10 +96,17 @@ code { font-family: "SFMono-Regular", Consolas, monospace; font-size: 12px; }
 .more { margin: 0; padding: 14px 24px; border-top: 1px solid #e4dfd5; color: #6e7d77; font-size: 12px; }
 .reference-row { min-height: 52px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; border-bottom: 1px solid #ece8df; font-size: 13px; }
 .reference-row small { color: #84918c; font-family: "SFMono-Regular", Consolas, monospace; }
+.formatting-row { min-height: 58px; display: grid; grid-template-columns: 150px 1fr auto; align-items: center; gap: 16px; border-bottom: 1px solid #ece8df; font-size: 13px; }
+.formatting-row:last-child { border-bottom: 0; }
+.formatting-row strong { text-transform: capitalize; }
+.formatting-row span { color: #61736d; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.formatting-row i { padding-inline: 5px; color: #9baaa4; font-style: normal; }
+.formatting-row small { color: #126348; font: 10px "SFMono-Regular", Consolas, monospace; }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; }
 .status-dot.resolved { background: #29805e; box-shadow: 0 0 0 4px #dcece2; }
 .status-dot.unresolved { background: var(--orange); box-shadow: 0 0 0 4px #f5ded5; }
 .anomaly-card { border-color: #dc8f75; background: #fffaf6; }
+.warning-card { border-color: #d7b96b; background: #fffcf2; }
 .anomaly { padding: 18px 24px; display: grid; grid-template-columns: 70px 1fr auto; gap: 12px; align-items: center; border-bottom: 1px solid #efded6; }
 .anomaly:last-child { border-bottom: 0; }
 .anomaly span { color: var(--orange); font: 11px "SFMono-Regular", Consolas, monospace; }
@@ -138,10 +145,12 @@ footer { min-height: 100px; border-top: 1px solid var(--line); display: flex; ju
   .document-motif { display: none; }
   h1 { font-size: clamp(54px, 16vw, 78px); }
   .summary-grid { grid-template-columns: repeat(2, 1fr); }
-  .stat:nth-child(2) { border-right: 0; }
-  .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .stat:nth-child(even) { border-right: 0; }
+  .stat:nth-child(-n+4) { border-bottom: 1px solid var(--line); }
   .plan-sections { padding: 14px; }
   .change-row { grid-template-columns: 85px 20px 100px auto; padding: 10px 0; }
+  .formatting-row { grid-template-columns: 1fr auto; padding: 11px 0; }
+  .formatting-row span { grid-column: 1 / -1; }
   .preview { grid-column: 1 / -1; }
   .anomaly { grid-template-columns: 1fr; }
   .apply-bar { align-items: stretch; flex-direction: column; }

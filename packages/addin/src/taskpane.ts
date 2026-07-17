@@ -38,6 +38,7 @@ function renderPlan(plan: RepairPlan): void {
   const grid = element("div", "summary-grid");
   const stats = [
     [plan.summary.numberingConversions, "numbers"],
+    [plan.formatting.length, "formatting"],
     [plan.summary.crossReferencesConverted, "references"],
     [plan.summary.brokenReferences, "broken"],
     [plan.summary.anomalies, "review"]
@@ -48,6 +49,19 @@ function renderPlan(plan: RepairPlan): void {
     grid.append(stat);
   }
   results.append(grid);
+
+  if (plan.formatting.length) {
+    const section = element("section", "changes");
+    section.append(element("h2", "", "Formatting plan"));
+    const groups = new Map<string, number>();
+    for (const change of plan.formatting) groups.set(change.category, (groups.get(change.category) ?? 0) + 1);
+    for (const [category, count] of groups) {
+      const row = element("div", "change");
+      row.append(element("strong", "", category.replace("-", " ")), element("span", "", `${count} ${count === 1 ? "repair" : "repairs"}`));
+      section.append(row);
+    }
+    results.append(section);
+  }
 
   if (plan.anomalies.length || plan.warnings.length) {
     const section = element("section", "findings");

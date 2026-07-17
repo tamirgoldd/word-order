@@ -169,6 +169,20 @@ The corpus is the project's real asset:
 
 **Definition of done for v1:** engine passes the full corpus; web app fixes a real 50-page agreement in-browser in <5 seconds; add-in applies the same fix inside Word; a document repaired by the tool survives subsequent manual editing in Word without breaking.
 
+### Deterministic formatting-repair extension
+
+The same plan/rebuild pipeline also repairs high-confidence formatting damage:
+novelty or randomly swapped fonts, inconsistent point sizes, accidental
+bold/italic/underline, paragraph alignment and indentation drift, compressed or
+excessive spacing, highlighted placeholders, and uneven section margins. It
+emits reusable `LDTitle`, `LDSubtitle`, `LDSection`, `LDBody`, and `LDSignature`
+styles rather than layering on more direct formatting. Flat agreements numbered
+`1.`, `2.`, `3.` are represented as native top-level decimal lists.
+
+This extension keeps the zero-content-loss rule. Run-on paragraphs with no
+internal sentence boundary are surfaced as editorial warnings and are never
+rewritten automatically.
+
 ---
 
 ## Milestones

@@ -1,13 +1,16 @@
 # Legal Down
 
-Repair broken numbering and cross-references in legal Word documents without
-uploading the document anywhere.
+Repair broken numbering, cross-references, and chaotic formatting in legal Word
+documents without uploading the document anywhere.
 
 Legal Down is a deterministic, client-side OOXML repair engine. It turns typed
-clause labels into native Word multilevel numbering and textual references into
-live `REF` fields, while preserving document content and unrelated package
-parts. The web app works offline; the CLI is useful for batch checks; the Word
-add-in is a thin interface over the same engine.
+clause labels into native Word multilevel numbering, textual references into
+live `REF` fields, and severe direct-formatting drift into a small set of native
+Word styles. The engine repairs mixed fonts and sizes, accidental emphasis,
+alignment, indents, spacing, highlighting, and uneven margins while preserving
+document wording and unrelated package parts. The web app works offline; the
+CLI is useful for batch checks; the Word add-in is a thin interface over the
+same engine.
 
 > Early alpha: test on copies of non-confidential documents. A repair is never
 > applied when tracked changes are present or structural anomalies have not
@@ -38,6 +41,8 @@ pnpm --filter @legal-down/cli start -- fix agreement.docx -o agreement.fixed.doc
   unresolved anomalies.
 - Untouched ZIP entries are copied without XML reserialization.
 - Existing fields and out-of-scope document parts are retained.
+- Wording is never silently edited. Long paragraphs without sentence breaks
+  are reported for editorial review instead.
 
 See [Architecture](docs/architecture.md), [Word add-in sideloading](docs/addin.md),
 and [Contributing](CONTRIBUTING.md).

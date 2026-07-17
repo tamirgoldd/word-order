@@ -44,12 +44,45 @@ export interface ParagraphInventory {
 }
 
 export interface SchemeProfile {
+  topLevelKind: "article" | "flat-section";
   articleLabel: "ARTICLE" | "Article";
   articleFormat: "upperRoman" | "decimal" | "upperLetter";
   sectionLabel: "Section" | "section" | "none";
   sectionWidth: number;
   sectionSeparator: string;
   levelIndents: number[];
+}
+
+export type FormattingRole = "title" | "subtitle" | "heading" | "body" | "signature";
+
+export type FormattingCategory =
+  | "style"
+  | "font-family"
+  | "font-size"
+  | "emphasis"
+  | "alignment"
+  | "indent"
+  | "spacing"
+  | "highlight"
+  | "margins";
+
+export interface FormattingProfile {
+  fontFamily: string;
+  titleSizeHalfPoints: number;
+  subtitleSizeHalfPoints: number;
+  headingSizeHalfPoints: number;
+  bodySizeHalfPoints: number;
+  marginTwips: number;
+}
+
+export interface FormattingChange {
+  paragraphIndex: number | null;
+  role: FormattingRole | "section";
+  category: FormattingCategory;
+  oldValue: string;
+  newValue: string;
+  textPreview: string;
+  confidence: "high" | "review";
 }
 
 export interface NumberingChange {
@@ -93,7 +126,7 @@ export interface PlanAnomaly {
 }
 
 export interface PlanWarning {
-  code: "broken-reference" | "unsupported-reference-format";
+  code: "broken-reference" | "unsupported-reference-format" | "long-paragraph";
   paragraphIndex: number;
   message: string;
 }
@@ -104,10 +137,12 @@ export interface RepairPlan {
   status: PlanStatus;
   blockedReason: string | null;
   profile: SchemeProfile;
+  formattingProfile: FormattingProfile;
   inventory: ParagraphInventory[];
   targets: NumberedTarget[];
   numbering: NumberingChange[];
   crossReferences: CrossReferencePlan[];
+  formatting: FormattingChange[];
   anomalies: PlanAnomaly[];
   warnings: PlanWarning[];
   summary: {

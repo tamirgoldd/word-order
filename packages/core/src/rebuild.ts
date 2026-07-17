@@ -1,5 +1,6 @@
 import type { DocxPackage } from "./package.js";
 import type { RepairPlan } from "./types.js";
+import { normalizeMargins, normalizeParagraphFormatting } from "./formatting.js";
 import {
   addBookmark,
   maxNumericAttribute,
@@ -21,11 +22,13 @@ function addNumberingDefinition(existing: string | null, plan: RepairPlan): { xm
   const abstractId = maxNumericAttribute(base, "w:abstractNumId") + 1;
   const numId = maxNumericAttribute(base, "w:numId") + 1;
   const articleText = `${plan.profile.articleLabel} %1`;
+  const topLevelFormat = plan.profile.topLevelKind === "flat-section" ? "decimal" : plan.profile.articleFormat;
+  const topLevelText = plan.profile.topLevelKind === "flat-section" ? "%1." : articleText;
   const sectionText = plan.profile.sectionLabel === "none" ? "%1.%2" : `${plan.profile.sectionLabel} %1.%2`;
   const abstract = [
     `<w:abstractNum w:abstractNumId="${abstractId}">`,
     `<w:nsid w:val="4C444F57"/><w:multiLevelType w:val="multilevel"/><w:name w:val="Legal Down"/>`,
-    levelXml(0, 1, plan.profile.articleFormat, articleText, plan.profile.levelIndents[0] ?? 0),
+    levelXml(0, 1, topLevelFormat, topLevelText, plan.profile.levelIndents[0] ?? 0),
     levelXml(1, 1, "decimalZero", sectionText, plan.profile.levelIndents[1] ?? 720, true),
     levelXml(2, 1, "lowerLetter", "(%3)", plan.profile.levelIndents[2] ?? 1440),
     levelXml(3, 1, "lowerRoman", "(%4)", plan.profile.levelIndents[3] ?? 2160),
@@ -37,12 +40,21 @@ function addNumberingDefinition(existing: string | null, plan: RepairPlan): { xm
 
 function ensureStyles(existing: string | null, plan: RepairPlan): string {
   let xml = existing ?? `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="${WORD_NS}"></w:styles>`;
-  const styles = ["LDArticle", "LDSection", "LDClause", "LDSubclause"];
-  const additions = styles.flatMap((styleId, index) => {
+  const font = plan.formattingProfile.fontFamily;
+  const styles = [
+    { id: "LDArticle", name: "Legal Down Article", pPr: `<w:keepNext/><w:spacing w:before="240" w:after="120"/><w:ind w:left="${plan.profile.levelIndents[0] ?? 0}"/>`, rPr: `<w:rFonts w:ascii="${font}" w:hAnsi="${font}"/><w:b/><w:sz w:val="${plan.formattingProfile.headingSizeHalfPoints}"/><w:szCs w:val="${plan.formattingProfile.headingSizeHalfPoints}"/>` },
+    { id: "LDSection", name: "Legal Down Section", pPr: `<w:keepNext/><w:spacing w:before="240" w:after="120"/><w:ind w:left="${plan.profile.topLevelKind === "flat-section" ? 0 : plan.profile.levelIndents[1] ?? 720}"/>`, rPr: `<w:rFonts w:ascii="${font}" w:hAnsi="${font}"/><w:b/><w:sz w:val="${plan.formattingProfile.headingSizeHalfPoints}"/><w:szCs w:val="${plan.formattingProfile.headingSizeHalfPoints}"/>` },
+    { id: "LDClause", name: "Legal Down Clause", pPr: `<w:spacing w:after="80"/><w:ind w:left="${plan.profile.levelIndents[2] ?? 1440}"/>`, rPr: `<w:rFonts w:ascii="${font}" w:hAnsi="${font}"/><w:sz w:val="${plan.formattingProfile.bodySizeHalfPoints}"/><w:szCs w:val="${plan.formattingProfile.bodySizeHalfPoints}"/>` },
+    { id: "LDSubclause", name: "Legal Down Subclause", pPr: `<w:spacing w:after="80"/><w:ind w:left="${plan.profile.levelIndents[3] ?? 2160}"/>`, rPr: `<w:rFonts w:ascii="${font}" w:hAnsi="${font}"/><w:sz w:val="${plan.formattingProfile.bodySizeHalfPoints}"/><w:szCs w:val="${plan.formattingProfile.bodySizeHalfPoints}"/>` },
+    { id: "LDTitle", name: "Legal Down Title", pPr: `<w:jc w:val="center"/><w:keepNext/><w:spacing w:after="80"/>`, rPr: `<w:rFonts w:ascii="${font}" w:hAnsi="${font}"/><w:b/><w:sz w:val="${plan.formattingProfile.titleSizeHalfPoints}"/><w:szCs w:val="${plan.formattingProfile.titleSizeHalfPoints}"/>` },
+    { id: "LDSubtitle", name: "Legal Down Subtitle", pPr: `<w:jc w:val="center"/><w:keepNext/><w:spacing w:after="240"/>`, rPr: `<w:rFonts w:ascii="${font}" w:hAnsi="${font}"/><w:i/><w:sz w:val="${plan.formattingProfile.subtitleSizeHalfPoints}"/><w:szCs w:val="${plan.formattingProfile.subtitleSizeHalfPoints}"/>` },
+    { id: "LDBody", name: "Legal Down Body", pPr: `<w:jc w:val="both"/><w:spacing w:after="120" w:line="276" w:lineRule="auto"/>`, rPr: `<w:rFonts w:ascii="${font}" w:hAnsi="${font}"/><w:sz w:val="${plan.formattingProfile.bodySizeHalfPoints}"/><w:szCs w:val="${plan.formattingProfile.bodySizeHalfPoints}"/>` },
+    { id: "LDSignature", name: "Legal Down Signature", pPr: `<w:jc w:val="left"/><w:spacing w:before="80" w:after="120"/>`, rPr: `<w:rFonts w:ascii="${font}" w:hAnsi="${font}"/><w:sz w:val="${plan.formattingProfile.bodySizeHalfPoints}"/><w:szCs w:val="${plan.formattingProfile.bodySizeHalfPoints}"/>` }
+  ];
+  const additions = styles.flatMap((style) => {
+    const styleId = style.id;
     if (new RegExp(`w:styleId=["']${styleId}["']`).test(xml)) return [];
-    const name = ["Legal Down Article", "Legal Down Section", "Legal Down Clause", "Legal Down Subclause"][index] ?? styleId;
-    const indent = plan.profile.levelIndents[index] ?? index * 720;
-    return [`<w:style w:type="paragraph" w:customStyle="1" w:styleId="${styleId}"><w:name w:val="${name}"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:ind w:left="${indent}"/></w:pPr></w:style>`];
+    return [`<w:style w:type="paragraph" w:customStyle="1" w:styleId="${styleId}"><w:name w:val="${style.name}"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr>${style.pPr}</w:pPr><w:rPr>${style.rPr}</w:rPr></w:style>`];
   }).join("");
   if (additions) xml = xml.replace(/<\/w:styles>\s*$/, `${additions}</w:styles>`);
   return xml;
@@ -83,14 +95,16 @@ function ensureContentTypes(existing: string, parts: Array<{ name: string; type:
   return xml;
 }
 
-function styleForLevel(level: number): string {
+function styleForLevel(level: number, plan: RepairPlan): string {
+  if (level === 0 && plan.profile.topLevelKind === "flat-section") return "LDSection";
   return ["LDArticle", "LDSection", "LDClause", "LDSubclause"][Math.min(level, 3)] ?? "LDClause";
 }
 
 export async function rebuildDocx(docx: DocxPackage, plan: RepairPlan): Promise<Uint8Array> {
   const rebuildNumbering = plan.numbering.length > 0;
   const resolvedReferences = plan.crossReferences.filter((reference) => reference.status === "resolved");
-  if (!rebuildNumbering && resolvedReferences.length === 0) return docx.original.slice();
+  const rebuildFormatting = plan.formatting.length > 0;
+  if (!rebuildNumbering && resolvedReferences.length === 0 && !rebuildFormatting) return docx.original.slice();
 
   let numberingXml = docx.numberingXml;
   let numId = -1;
@@ -109,6 +123,9 @@ export async function rebuildDocx(docx: DocxPackage, plan: RepairPlan): Promise<
     list.push(reference);
     referencesByParagraph.set(reference.paragraphIndex, list);
   }
+  const formattingRoles = new Map(plan.formatting.flatMap((change) => change.paragraphIndex === null || change.role === "section"
+    ? []
+    : [[change.paragraphIndex, change.role] as const]));
   let bookmarkId = maxNumericAttribute(docx.documentXml, "w:id") + 1;
   let paragraphIndex = 0;
   const documentXml = docx.documentXml.replace(/<w:p\b[^>]*>[\s\S]*?<\/w:p>/g, (originalParagraph) => {
@@ -122,7 +139,7 @@ export async function rebuildDocx(docx: DocxPackage, plan: RepairPlan): Promise<
       paragraph = stripVisiblePrefix(paragraph, stripLength);
     }
     if (rebuildNumbering && target) {
-      paragraph = setParagraphNumbering(paragraph, numId, target.level, styleForLevel(target.level));
+      paragraph = setParagraphNumbering(paragraph, numId, target.level, styleForLevel(target.level, plan));
     }
     if (target && referencedTargets.has(index)) {
       paragraph = addBookmark(paragraph, bookmarkId, target.bookmarkName);
@@ -132,10 +149,16 @@ export async function rebuildDocx(docx: DocxPackage, plan: RepairPlan): Promise<
       if (!reference.bookmarkName) continue;
       paragraph = replaceTextWithRefField(paragraph, reference.display, reference.bookmarkName).xml;
     }
+    const formattingRole = formattingRoles.get(index);
+    if (formattingRole) paragraph = normalizeParagraphFormatting(paragraph, formattingRole);
     return paragraph;
   });
 
-  docx.zip.file("word/document.xml", documentXml);
+  const normalizedDocumentXml = rebuildFormatting && plan.formatting.some((change) => change.category === "margins")
+    ? normalizeMargins(documentXml, plan.formattingProfile)
+    : documentXml;
+
+  docx.zip.file("word/document.xml", normalizedDocumentXml);
   if (numberingXml) docx.zip.file("word/numbering.xml", numberingXml);
   docx.zip.file("word/styles.xml", ensureStyles(docx.stylesXml, plan));
   docx.zip.file("word/settings.xml", ensureSettings(docx.settingsXml));

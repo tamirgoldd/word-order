@@ -40,9 +40,10 @@ function PrivacyProof(): React.JSX.Element {
 function Summary({ plan }: { plan: RepairPlan }): React.JSX.Element {
   const stats = [
     [plan.summary.numberingConversions, "numbers repaired"],
+    [plan.formatting.length, "formatting repairs"],
     [plan.summary.crossReferencesConverted, "references linked"],
     [plan.summary.brokenReferences, "broken references"],
-    [plan.summary.anomalies, "items to review"]
+    [plan.summary.anomalies + plan.warnings.length, "items to review"]
   ] as const;
   return (
     <div className="summary-grid">
@@ -57,6 +58,12 @@ function Summary({ plan }: { plan: RepairPlan }): React.JSX.Element {
 }
 
 function PlanReview({ plan }: { plan: RepairPlan }): React.JSX.Element {
+  const formattingGroups = [...plan.formatting.reduce((groups, change) => {
+    const list = groups.get(change.category) ?? [];
+    list.push(change);
+    groups.set(change.category, list);
+    return groups;
+  }, new Map<string, typeof plan.formatting>()).entries()];
   return (
     <div className="plan-sections">
       {plan.numbering.length > 0 && (
@@ -77,6 +84,27 @@ function PlanReview({ plan }: { plan: RepairPlan }): React.JSX.Element {
             ))}
           </div>
           {plan.numbering.length > 12 && <p className="more">+ {plan.numbering.length - 12} more changes in the downloaded report</p>}
+        </section>
+      )}
+
+      {plan.formatting.length > 0 && (
+        <section className="review-card">
+          <div className="section-heading">
+            <div><span className="eyebrow">Formatting plan</span><h3>Inconsistent styling becomes a restrained legal-document system</h3></div>
+            <span className="count">{plan.formatting.length}</span>
+          </div>
+          <div className="formatting-list">
+            {formattingGroups.map(([category, changes]) => {
+              const example = changes[0];
+              return (
+                <div className="formatting-row" key={category}>
+                  <strong>{category.replace("-", " ")}</strong>
+                  <span>{example?.oldValue} <i aria-hidden="true">→</i> {example?.newValue}</span>
+                  <small>{changes.length} {changes.length === 1 ? "repair" : "repairs"}</small>
+                </div>
+              );
+            })}
+          </div>
         </section>
       )}
 
@@ -108,6 +136,22 @@ function PlanReview({ plan }: { plan: RepairPlan }): React.JSX.Element {
               <span>¶ {anomaly.paragraphIndex + 1}</span>
               <p>{anomaly.message}</p>
               {anomaly.proposedNumber && <code>{anomaly.oldNumber} → {anomaly.proposedNumber}</code>}
+            </div>
+          ))}
+        </section>
+      )}
+
+
+      {plan.warnings.length > 0 && (
+        <section className="review-card warning-card">
+          <div className="section-heading">
+            <div><span className="eyebrow">Editorial review</span><h3>Wording we deliberately did not rewrite</h3></div>
+            <span className="count">{plan.warnings.length}</span>
+          </div>
+          {plan.warnings.map((warning, index) => (
+            <div className="anomaly" key={`${warning.paragraphIndex}-${warning.code}-${index}`}>
+              <span>¶ {warning.paragraphIndex + 1}</span>
+              <p>{warning.message}</p>
             </div>
           ))}
         </section>
@@ -194,8 +238,8 @@ export function App(): React.JSX.Element {
         <section className={plan ? "hero compact" : "hero"}>
           <div className="hero-copy">
             <p className="kicker"><span /> Free · open source · local-first</p>
-            <h1>Word numbering broke.<br /><em>Fix the structure.</em></h1>
-            <p className="lede">Repair mangled legal numbering and dead cross-references in one pass. Get back a real Word document that keeps renumbering when the draft changes.</p>
+            <h1>Your Word draft broke.<br /><em>Fix the structure.</em></h1>
+            <p className="lede">Repair mangled legal numbering, dead cross-references, and chaotic formatting in one pass. Get back a professional Word document that keeps working when the draft changes.</p>
             <PrivacyProof />
           </div>
           {!plan && <div className="document-motif" aria-hidden="true"><div className="paper back" /><div className="paper"><b>ARTICLE IV</b><span>Section 4.01</span><span className="broken-line">8.3</span><span>(a)</span><i>REF</i></div></div>}
@@ -247,7 +291,7 @@ export function App(): React.JSX.Element {
                   <button className="primary download-button" type="button" disabled={busy || (confirmationNeeded && !confirmed)} onClick={() => void apply()}>{stage === "repairing" ? "Building document…" : "Download fixed .docx"}</button>
                 </div>
               )}
-              {plan.status === "clean" && <div className="clean-message"><strong>Nothing to fix.</strong><span>The document already uses consistent native numbering and has no convertible references.</span></div>}
+              {plan.status === "clean" && <div className="clean-message"><strong>No automatic repairs remain.</strong><span>{plan.warnings.length ? `${plan.warnings.length} editorial ${plan.warnings.length === 1 ? "warning remains" : "warnings remain"} for human review.` : "The document already uses consistent native numbering, formatting, and references."}</span></div>}
             </div>
           )}
           {error && <div className="error-message" role="alert">{error}</div>}
@@ -267,6 +311,7 @@ export function App(): React.JSX.Element {
               <span className="eyebrow">Plain answers</span>
               <details><summary>Does my contract leave the computer?</summary><p>No. The page has no document API or upload endpoint. Parsing and rebuilding happen in this browser tab, and the app can run after you disconnect from the internet.</p></details>
               <details><summary>Will the numbers still work after someone edits the file?</summary><p>Yes. Legal Down creates Word's native multilevel numbering rather than hardcoded text, then uses bookmarks and REF fields for cross-references.</p></details>
+              <details><summary>Does it rewrite contract language?</summary><p>No. It normalizes styles, spacing, margins, highlighting, and structure. Suspiciously long run-on paragraphs are flagged for human review without changing their wording.</p></details>
               <details><summary>What happens to tracked changes?</summary><p>Legal Down stops and asks you to accept or reject them first. It does not attempt a risky repair through revision markup.</p></details>
             </section>
           </>
