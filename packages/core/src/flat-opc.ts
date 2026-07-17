@@ -34,12 +34,17 @@ export async function flatOpcToDocx(flatOpc: string): Promise<Uint8Array> {
     throw new LegalDownError("UNSUPPORTED_DOCUMENT", "Word did not return a Flat OPC document package.");
   }
   const zip = new JSZip();
+  const contentTypes = new Map<string, string>();
   for (const partMatch of flatOpc.matchAll(/<pkg:part\b([^>]*)>([\s\S]*?)<\/pkg:part>/g)) {
     const attributes = partMatch[1] ?? "";
     const body = partMatch[2] ?? "";
     const encodedName = attributes.match(/pkg:name=["']([^"']+)["']/)?.[1];
     if (!encodedName) continue;
     const name = decodeXml(encodedName).replace(/^\//, "");
+    const encodedContentType = attributes.match(/pkg:contentType=["']([^"']+)["']/)?.[1];
+    if (encodedContentType && name !== "[Content_Types].xml") {
+      contentTypes.set(`/${name}`, decodeXml(encodedContentType));
+    }
     const xmlData = body.match(/<pkg:xmlData>([\s\S]*?)<\/pkg:xmlData>/)?.[1];
     const binaryData = body.match(/<pkg:binaryData>([\s\S]*?)<\/pkg:binaryData>/)?.[1];
     if (xmlData !== undefined) {
@@ -47,6 +52,18 @@ export async function flatOpcToDocx(flatOpc: string): Promise<Uint8Array> {
     } else if (binaryData !== undefined) {
       zip.file(name, base64ToBytes(binaryData));
     }
+  }
+  if (!zip.file("[Content_Types].xml")) {
+    const overrides = [...contentTypes]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([partName, contentType]) =>
+        `<Override PartName="${encodeXml(partName)}" ContentType="${encodeXml(contentType)}"/>`
+      )
+      .join("");
+    zip.file(
+      "[Content_Types].xml",
+      `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">${overrides}</Types>`
+    );
   }
   if (!zip.file("word/document.xml")) {
     throw new LegalDownError("UNSUPPORTED_DOCUMENT", "The Word OOXML package does not contain word/document.xml.");
@@ -61,7 +78,7 @@ export async function docxToFlatOpc(bytes: Uint8Array): Promise<string> {
   const types = contentTypeMap(contentTypesXml);
   const parts: string[] = [];
   for (const [name, entry] of Object.entries(zip.files).sort(([left], [right]) => left.localeCompare(right))) {
-    if (entry.dir) continue;
+    if (entry.dir || name === "[Content_Types].xml") continue;
     const partName = `/${name}`;
     const extension = name.includes(".") ? name.split(".").at(-1)?.toLowerCase() ?? "" : "";
     const contentType = types.overrides.get(partName) ?? types.defaults.get(extension) ?? "application/octet-stream";

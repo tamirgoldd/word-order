@@ -231,6 +231,7 @@ describe("OOXML rebuild", () => {
   it("adapts Word Flat OPC packages without changing visible content", async () => {
     const input = await createSyntheticDocx(basicParagraphs);
     const flatOpc = await docxToFlatOpc(input);
+    expect(flatOpc).not.toContain('pkg:name="/[Content_Types].xml"');
     const roundTrip = await flatOpcToDocx(flatOpc);
     expect(await validateDocxPackage(roundTrip)).toEqual([]);
     expect((await compareTextModuloNumberTokens(input, roundTrip)).equal).toBe(true);
