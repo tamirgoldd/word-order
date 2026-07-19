@@ -1,5 +1,5 @@
 {
-  "name": "@legal-down/core",
+  "name": "@word-order/core",
   "version": "0.1.0",
   "description": "Deterministic, DOM-free OOXML repair engine for legal documents.",
   "type": "module",

@@ -2,10 +2,10 @@ import {
   createRepairPlan,
   docxToFlatOpc,
   flatOpcToDocx,
-  LegalDownError,
+  WordOrderError,
   repairDocument,
   type RepairPlan
-} from "@legal-down/core";
+} from "@word-order/core";
 import "./taskpane.css";
 
 const scanButton = document.querySelector<HTMLButtonElement>("#scan")!;
@@ -144,7 +144,7 @@ async function applyRepair(): Promise<void> {
     sourceBytes = null;
     activePlan = null;
   } catch (cause) {
-    status.textContent = cause instanceof LegalDownError ? cause.message : cause instanceof Error ? cause.message : "The repair could not be applied safely.";
+    status.textContent = cause instanceof WordOrderError ? cause.message : cause instanceof Error ? cause.message : "The repair could not be applied safely.";
     status.className = "notice error";
   } finally {
     scanButton.disabled = false;

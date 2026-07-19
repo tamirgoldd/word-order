@@ -1,5 +1,5 @@
 {
-  "name": "@legal-down/addin",
+  "name": "@word-order/addin",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -9,7 +9,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@legal-down/core": "workspace:*"
+    "@word-order/core": "workspace:*"
   },
   "devDependencies": {
     "@types/office-js": "^1.0.500",

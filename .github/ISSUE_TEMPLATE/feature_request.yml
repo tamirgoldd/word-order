@@ -1,0 +1,21 @@
+name: Feature request
+description: Propose a focused improvement to Word Order.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes:
+      label: Document problem
+      description: What recurring DOCX problem should Word Order handle?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Safe, deterministic behavior
+      description: What should the tool change, preserve, flag, or refuse to guess?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Example
+      description: Describe a synthetic example. Do not attach confidential documents.

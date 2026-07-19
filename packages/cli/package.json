@@ -1,10 +1,10 @@
 {
-  "name": "@legal-down/cli",
+  "name": "@word-order/cli",
   "version": "0.1.0",
-  "description": "Command-line interface for Legal Down.",
+  "description": "Command-line interface for Word Order.",
   "type": "module",
   "bin": {
-    "legal-down": "./dist/index.js"
+    "word-order": "./dist/index.js"
   },
   "files": ["dist"],
   "scripts": {
@@ -13,7 +13,7 @@
     "start": "tsx src/index.ts"
   },
   "dependencies": {
-    "@legal-down/core": "workspace:*"
+    "@word-order/core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

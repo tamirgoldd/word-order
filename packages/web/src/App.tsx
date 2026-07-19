@@ -1,10 +1,10 @@
 import { useCallback, useRef, useState } from "react";
 import {
   createRepairPlan,
-  LegalDownError,
+  WordOrderError,
   repairDocument,
   type RepairPlan
-} from "@legal-down/core";
+} from "@word-order/core";
 
 type Stage = "idle" | "reading" | "review" | "repairing";
 
@@ -34,6 +34,71 @@ function PrivacyProof(): React.JSX.Element {
       <span><i aria-hidden="true">02</i> No upload</span>
       <span><i aria-hidden="true">03</i> Works offline</span>
     </div>
+  );
+}
+
+function BeforeAfter(): React.JSX.Element {
+  return (
+    <section className="example-section" id="example">
+      <div className="section-intro">
+        <span className="eyebrow">A real repair</span>
+        <h2>Same words.<br />Back in order.</h2>
+        <p>This synthetic agreement was deliberately damaged with mixed fonts, broken numbering, random emphasis, bad alignment, deep indents, uneven margins, and a highlighted placeholder. Word Order repaired the document without rewriting its language.</p>
+      </div>
+      <div className="comparison" aria-label="Before and after document comparison">
+        <figure className="document-shot before-shot">
+          <figcaption><strong>Before</strong><span>Broken structure + formatting</span></figcaption>
+          <div className="image-frame"><img src="examples/before-agreement.png" alt="A badly formatted services agreement with inconsistent numbering, typography, alignment, spacing, and a highlighted amount placeholder" /></div>
+        </figure>
+        <div className="comparison-arrow" aria-hidden="true"><span>→</span><small>one local pass</small></div>
+        <figure className="document-shot after-shot">
+          <figcaption><strong>After</strong><span>Native lists + restrained styles</span></figcaption>
+          <div className="image-frame"><img src="examples/after-agreement.png" alt="The same services agreement after repair, with ordered numbering, consistent typography, alignment, margins, and spacing" /></div>
+        </figure>
+      </div>
+      <p className="example-note"><span>✓</span> Rendered from the actual input and output DOCX files. The sample is synthetic and contains no client information.</p>
+    </section>
+  );
+}
+
+function ProductStory(): React.JSX.Element {
+  return (
+    <>
+      <section className="trust-strip" aria-label="Product guarantees">
+        <article><span>01</span><strong>Local by design</strong><p>Your document bytes never leave the browser.</p></article>
+        <article><span>02</span><strong>Native Word output</strong><p>Real lists, bookmarks, fields, and reusable styles.</p></article>
+        <article><span>03</span><strong>Review before repair</strong><p>Every proposed change is visible before download.</p></article>
+        <article><span>04</span><strong>Open source</strong><p>Inspect the engine, run it offline, or contribute.</p></article>
+      </section>
+
+      <BeforeAfter />
+
+      <section className="how" id="how-it-works">
+        <div className="section-intro compact-intro"><span className="eyebrow">How it works</span><h2>A repair plan<br />you can inspect.</h2><p>No generative AI and no silent rewriting. The same deterministic engine powers the website, CLI, and Word add-in.</p></div>
+        <div className="principles">
+          <article><span>01</span><h3>Inventory</h3><p>Reads typed numbers, Word lists, indentation, styles, tables, fields, and references.</p></article>
+          <article><span>02</span><h3>Plan</h3><p>Shows each proposed repair and stops when the document is unsafe or ambiguous.</p></article>
+          <article><span>03</span><h3>Rebuild</h3><p>Writes native multilevel lists, live references, and a coherent Word style system.</p></article>
+        </div>
+      </section>
+
+      <section className="coverage" id="what-it-fixes">
+        <div className="section-intro"><span className="eyebrow">One pass, full cleanup</span><h2>More than numbering.</h2><p>The formatting engine activates only when it sees strong evidence of damage, then removes the drift without flattening the document.</p></div>
+        <div className="coverage-grid">
+          <article><span>1 → 2 → 3</span><h3>Broken numbering</h3><p>Duplicates, skips, pasted clauses, manual labels, and damaged restarts become native Word lists.</p></article>
+          <article><span>Aa · Aa · Aa</span><h3>Font chaos</h3><p>Comic Sans titles and Times, Arial, Calibri, Georgia, Courier, or Verdana swaps collapse into a restrained style system.</p></article>
+          <article><span><b>B</b> <i>I</i> <u>U</u></span><h3>Random emphasis</h3><p>Accidental bold, italic, underline, and size changes are removed while meaningful emphasis is preserved.</p></article>
+          <article><span>↔ ↤ ↦</span><h3>Layout drift</h3><p>Centered clauses, right-aligned signatures, deep indents, spacing, and uneven margins are normalized.</p></article>
+          <article><span>§ 4.02 ↗</span><h3>Dead references</h3><p>Text references are audited and converted into Word REF fields when a safe target exists.</p></article>
+          <article><span>[AMOUNT]</span><h3>Placeholder noise</h3><p>Stray highlighting is cleared while bracketed placeholder text remains intact and reviewable.</p></article>
+        </div>
+      </section>
+
+      <section className="open-source">
+        <div><span className="eyebrow">Built in public</span><h2>The engine is the product.</h2></div>
+        <div className="source-copy"><p>Word Order is a small TypeScript monorepo with one DOM-free OOXML core shared by the web app, CLI, and Word add-in. Unknown XML and untouched package parts are preserved.</p><div className="source-actions"><a className="button dark" href="https://github.com/tamirgoldd/word-order" target="_blank" rel="noreferrer">Explore the GitHub repo ↗</a><a className="text-link" href="https://github.com/tamirgoldd/word-order/blob/main/docs/architecture.md" target="_blank" rel="noreferrer">Read the architecture</a></div></div>
+      </section>
+    </>
   );
 }
 
@@ -204,7 +269,7 @@ export function App(): React.JSX.Element {
       if (result.changed) download(result.bytes, file.name);
       else setError("This document is already structurally clean. No new file was needed.");
     } catch (cause) {
-      setError(cause instanceof LegalDownError ? cause.message : "The repair could not be completed safely.");
+      setError(cause instanceof WordOrderError ? cause.message : "The repair could not be completed safely.");
     } finally {
       setStage("review");
     }
@@ -227,25 +292,29 @@ export function App(): React.JSX.Element {
   return (
     <div className="page-shell">
       <header className="site-header">
-        <a className="brand" href="." aria-label="Legal Down home"><span className="brand-mark">LD</span><span>Legal Down</span></a>
+        <a className="brand" href="." aria-label="Word Order home"><span className="brand-mark"><i>W</i><i>O</i></span><span>Word Order</span></a>
         <nav>
+          <a href="#example">Before &amp; after</a>
           <a href="#how-it-works">How it works</a>
-          <a href="https://github.com/tamirgoldd/legal-down" target="_blank" rel="noreferrer">Source ↗</a>
+          <a href="#what-it-fixes">What it fixes</a>
+          <a className="nav-source" href="https://github.com/tamirgoldd/word-order" target="_blank" rel="noreferrer">GitHub ↗</a>
         </nav>
       </header>
 
       <main>
         <section className={plan ? "hero compact" : "hero"}>
           <div className="hero-copy">
-            <p className="kicker"><span /> Free · open source · local-first</p>
-            <h1>Your Word draft broke.<br /><em>Fix the structure.</em></h1>
-            <p className="lede">Repair mangled legal numbering, dead cross-references, and chaotic formatting in one pass. Get back a professional Word document that keeps working when the draft changes.</p>
+            <p className="kicker"><span /> Private DOCX repair for legal teams</p>
+            <h1>Put broken Word documents <em>back in order.</em></h1>
+            <p className="lede">Repair numbering, cross-references, fonts, spacing, alignment, and margins in one inspectable pass. The document stays on your device.</p>
+            {!plan && <div className="hero-actions"><a className="button" href="#repair">Repair a document</a><a className="text-link" href="#example">See a real before &amp; after ↓</a></div>}
             <PrivacyProof />
           </div>
-          {!plan && <div className="document-motif" aria-hidden="true"><div className="paper back" /><div className="paper"><b>ARTICLE IV</b><span>Section 4.01</span><span className="broken-line">8.3</span><span>(a)</span><i>REF</i></div></div>}
+          {!plan && <div className="repair-card" aria-label="Example repair summary"><div className="repair-card-head"><span>REPAIR PLAN</span><small>word-order.local</small></div><div className="repair-score"><strong>27</strong><span>safe repairs found</span></div><div className="repair-list"><p><i>01</i><span>Numbering</span><s>1, 3, 3, 2</s><b>1, 2, 3, 4</b></p><p><i>02</i><span>Typography</span><s>6 font families</s><b>1 style system</b></p><p><i>03</i><span>Layout</span><s>drifted</s><b>normalized</b></p><p><i>04</i><span>Content</span><s>—</s><b>preserved</b></p></div><div className="repair-card-foot"><span>LOCAL ONLY</span><span>READY TO REVIEW</span></div></div>}
         </section>
 
-        <section className="workspace" aria-live="polite">
+        <section className="workspace" id="repair" aria-live="polite">
+          {!plan && <div className="workspace-heading"><span className="eyebrow">Try Word Order</span><h2>Repair a copy. Keep the original.</h2><p>No sign-up, no upload, no document telemetry.</p></div>}
           {!plan ? (
             <div
               className={dragging ? "dropzone dragging" : "dropzone"}
@@ -299,26 +368,19 @@ export function App(): React.JSX.Element {
 
         {!plan && (
           <>
-            <section className="how" id="how-it-works">
-              <div><span className="eyebrow">What changes</span><h2>Not a cosmetic patch.<br />A structural repair.</h2></div>
-              <div className="principles">
-                <article><span>1</span><h3>Inventory</h3><p>Reads typed numbers, Word lists, indentation, styles, tables, and references.</p></article>
-                <article><span>2</span><h3>Review</h3><p>Shows every proposed change and refuses ambiguous structure until you confirm.</p></article>
-                <article><span>3</span><h3>Rebuild</h3><p>Writes native multilevel lists, bookmarks, and live Word REF fields.</p></article>
-              </div>
-            </section>
+            <ProductStory />
             <section className="faq">
               <span className="eyebrow">Plain answers</span>
               <details><summary>Does my contract leave the computer?</summary><p>No. The page has no document API or upload endpoint. Parsing and rebuilding happen in this browser tab, and the app can run after you disconnect from the internet.</p></details>
-              <details><summary>Will the numbers still work after someone edits the file?</summary><p>Yes. Legal Down creates Word's native multilevel numbering rather than hardcoded text, then uses bookmarks and REF fields for cross-references.</p></details>
+              <details><summary>Will the numbers still work after someone edits the file?</summary><p>Yes. Word Order creates Word's native multilevel numbering rather than hardcoded text, then uses bookmarks and REF fields for cross-references.</p></details>
               <details><summary>Does it rewrite contract language?</summary><p>No. It normalizes styles, spacing, margins, highlighting, and structure. Suspiciously long run-on paragraphs are flagged for human review without changing their wording.</p></details>
-              <details><summary>What happens to tracked changes?</summary><p>Legal Down stops and asks you to accept or reject them first. It does not attempt a risky repair through revision markup.</p></details>
+              <details><summary>What happens to tracked changes?</summary><p>Word Order stops and asks you to accept or reject them first. It does not attempt a risky repair through revision markup.</p></details>
             </section>
           </>
         )}
       </main>
 
-      <footer><span>Legal Down is open source software, not legal advice.</span><a href="https://github.com/tamirgoldd/legal-down">MIT licensed · GitHub ↗</a></footer>
+      <footer><div><a className="brand footer-brand" href="." aria-label="Word Order home"><span className="brand-mark"><i>W</i><i>O</i></span><span>Word Order</span></a><p>Open source document repair. Not legal advice.<br />Not affiliated with or endorsed by Microsoft.</p></div><div className="footer-links"><a href="#repair">Repair a document</a><a href="https://github.com/tamirgoldd/word-order">GitHub ↗</a><span>MIT licensed · 2026</span></div></footer>
     </div>
   );
 }

@@ -1,9 +1,9 @@
 {
-  "name": "legal-down",
+  "name": "word-order",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Local-first repair for broken legal-document numbering and cross-references.",
+  "description": "Local-first repair for broken Word numbering, cross-references, and formatting.",
   "license": "MIT",
   "packageManager": "pnpm@11.9.0",
   "engines": {
@@ -11,11 +11,11 @@
   },
   "scripts": {
     "build": "pnpm -r --if-present build",
-    "build:pages": "pnpm --filter @legal-down/core build && pnpm --filter @legal-down/web build && pnpm --filter @legal-down/addin build && cp -R packages/addin/dist packages/web/dist/addin",
-    "dev": "pnpm --filter @legal-down/core build && pnpm --filter @legal-down/web dev",
+    "build:pages": "pnpm --filter @word-order/core build && pnpm --filter @word-order/web build && pnpm --filter @word-order/addin build && cp -R packages/addin/dist packages/web/dist/addin",
+    "dev": "pnpm --filter @word-order/core build && pnpm --filter @word-order/web dev",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "pnpm --filter @legal-down/core build && pnpm -r --filter '!@legal-down/core' --if-present typecheck",
+    "typecheck": "pnpm --filter @word-order/core build && pnpm -r --filter '!@word-order/core' --if-present typecheck",
     "corpus:generate": "tsx scripts/generate-corpus.ts",
     "check": "pnpm typecheck && pnpm test && pnpm build"
   },

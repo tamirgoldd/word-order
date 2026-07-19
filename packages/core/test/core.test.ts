@@ -1,6 +1,6 @@
 import JSZip from "jszip";
 import { describe, expect, it } from "vitest";
-import { createRepairPlan, docxToFlatOpc, flatOpcToDocx, LegalDownError, repairDocument } from "../src/index.js";
+import { createRepairPlan, docxToFlatOpc, flatOpcToDocx, WordOrderError, repairDocument } from "../src/index.js";
 import {
   compareTextModuloNumberTokens,
   createSyntheticDocx,
@@ -66,7 +66,7 @@ describe("repair planning", () => {
     const plan = await createRepairPlan(input);
 
     expect(plan.status).toBe("blocked");
-    await expect(repairDocument(input, plan)).rejects.toMatchObject<Partial<LegalDownError>>({ code: "TRACKED_CHANGES" });
+    await expect(repairDocument(input, plan)).rejects.toMatchObject<Partial<WordOrderError>>({ code: "TRACKED_CHANGES" });
   });
 
   it("includes numbered paragraphs inside tables", async () => {
@@ -217,7 +217,7 @@ describe("OOXML rebuild", () => {
       { text: "Section 1.09 Wrong" }
     ]);
     const plan = await createRepairPlan(input);
-    await expect(repairDocument(input, plan)).rejects.toMatchObject<Partial<LegalDownError>>({ code: "CONFIRMATION_REQUIRED" });
+    await expect(repairDocument(input, plan)).rejects.toMatchObject<Partial<WordOrderError>>({ code: "CONFIRMATION_REQUIRED" });
     await expect(repairDocument(input, plan, { allowAnomalies: true })).resolves.toMatchObject({ changed: true });
   });
 
@@ -225,7 +225,7 @@ describe("OOXML rebuild", () => {
     const first = await createSyntheticDocx([{ text: "Section 1.01 First" }]);
     const second = await createSyntheticDocx([{ text: "Section 2.01 Second" }]);
     const plan = await createRepairPlan(first);
-    await expect(repairDocument(second, plan)).rejects.toMatchObject<Partial<LegalDownError>>({ code: "SOURCE_MISMATCH" });
+    await expect(repairDocument(second, plan)).rejects.toMatchObject<Partial<WordOrderError>>({ code: "SOURCE_MISMATCH" });
   });
 
   it("adapts Word Flat OPC packages without changing visible content", async () => {

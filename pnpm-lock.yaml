@@ -23,7 +23,7 @@ importers:
 
   packages/addin:
     dependencies:
-      '@legal-down/core':
+      '@word-order/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -39,7 +39,7 @@ importers:
 
   packages/cli:
     dependencies:
-      '@legal-down/core':
+      '@word-order/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -65,7 +65,7 @@ importers:
 
   packages/web:
     dependencies:
-      '@legal-down/core':
+      '@word-order/core':
         specifier: workspace:*
         version: link:../core
       react:

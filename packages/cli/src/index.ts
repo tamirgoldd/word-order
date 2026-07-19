@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { access, readFile, writeFile } from "node:fs/promises";
 import { basename, resolve } from "node:path";
-import { createRepairPlan, LegalDownError, repairDocument, type RepairPlan } from "@legal-down/core";
+import { createRepairPlan, WordOrderError, repairDocument, type RepairPlan } from "@word-order/core";
 
 interface Arguments {
   command: "fix" | "scan";
@@ -12,11 +12,11 @@ interface Arguments {
   force: boolean;
 }
 
-const USAGE = `Legal Down — repair legal Word structure and formatting locally
+const USAGE = `Word Order — repair legal Word structure and formatting locally
 
 Usage:
-  legal-down scan <input.docx> [--report plan.json]
-  legal-down fix <input.docx> -o <output.docx> [--report plan.json]
+  word-order scan <input.docx> [--report plan.json]
+  word-order fix <input.docx> -o <output.docx> [--report plan.json]
                  [--allow-anomalies] [--force]
 
 The file is processed on this machine. No network request is made.`;
@@ -74,7 +74,7 @@ async function exists(path: string): Promise<boolean> {
 
 async function main(): Promise<void> {
   const args = parseArguments(process.argv.slice(2));
-  if (!args.input.toLowerCase().endsWith(".docx")) throw new Error("Legal Down supports .docx files only.");
+  if (!args.input.toLowerCase().endsWith(".docx")) throw new Error("Word Order supports .docx files only.");
   const input = new Uint8Array(await readFile(args.input));
   const plan = await createRepairPlan(input);
   console.log(humanPlan(plan));
@@ -93,7 +93,7 @@ async function main(): Promise<void> {
 }
 
 main().catch((error: unknown) => {
-  if (error instanceof LegalDownError) console.error(`${error.code}: ${error.message}`);
+  if (error instanceof WordOrderError) console.error(`${error.code}: ${error.message}`);
   else console.error(error instanceof Error ? error.message : String(error));
   process.exitCode = 1;
 });

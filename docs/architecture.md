@@ -1,6 +1,6 @@
 # Architecture
 
-Legal Down uses one deterministic engine across three interfaces. The core
+Word Order uses one deterministic engine across three interfaces. The core
 opens the OOXML ZIP, inventories paragraphs, infers hierarchy, audits severe
 formatting drift, creates a repair plan, and only then rebuilds the changed
 package parts.
@@ -19,6 +19,10 @@ removes only conflicting direct formatting. Meaningful all-caps emphasis and
 bracketed placeholders remain bold, but placeholder highlighting is removed.
 Long run-on paragraphs are warnings because changing their wording would violate
 the text-preservation invariant.
+
+The `LD*` style IDs and `_LDRef_*` bookmark names are legacy internal OOXML
+identifiers retained for compatibility with documents repaired before the Word
+Order rename. Their visible Word style names use the current product name.
 
 ## Failure boundaries
 

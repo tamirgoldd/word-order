@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { LegalDownError } from "./errors.js";
+import { WordOrderError } from "./errors.js";
 import { decodeXml, encodeXml } from "./xml.js";
 
 const PACKAGE_NS = "http://schemas.microsoft.com/office/2006/xmlPackage";
@@ -31,7 +31,7 @@ function contentTypeMap(xml: string): { defaults: Map<string, string>; overrides
 
 export async function flatOpcToDocx(flatOpc: string): Promise<Uint8Array> {
   if (!/<pkg:package\b/.test(flatOpc)) {
-    throw new LegalDownError("UNSUPPORTED_DOCUMENT", "Word did not return a Flat OPC document package.");
+    throw new WordOrderError("UNSUPPORTED_DOCUMENT", "Word did not return a Flat OPC document package.");
   }
   const zip = new JSZip();
   const contentTypes = new Map<string, string>();
@@ -66,7 +66,7 @@ export async function flatOpcToDocx(flatOpc: string): Promise<Uint8Array> {
     );
   }
   if (!zip.file("word/document.xml")) {
-    throw new LegalDownError("UNSUPPORTED_DOCUMENT", "The Word OOXML package does not contain word/document.xml.");
+    throw new WordOrderError("UNSUPPORTED_DOCUMENT", "The Word OOXML package does not contain word/document.xml.");
   }
   return zip.generateAsync({ type: "uint8array", compression: "DEFLATE" });
 }
@@ -74,7 +74,7 @@ export async function flatOpcToDocx(flatOpc: string): Promise<Uint8Array> {
 export async function docxToFlatOpc(bytes: Uint8Array): Promise<string> {
   const zip = await JSZip.loadAsync(bytes);
   const contentTypesXml = await zip.file("[Content_Types].xml")?.async("string");
-  if (!contentTypesXml) throw new LegalDownError("INVALID_DOCX", "The repaired package has no content-type manifest.");
+  if (!contentTypesXml) throw new WordOrderError("INVALID_DOCX", "The repaired package has no content-type manifest.");
   const types = contentTypeMap(contentTypesXml);
   const parts: string[] = [];
   for (const [name, entry] of Object.entries(zip.files).sort(([left], [right]) => left.localeCompare(right))) {

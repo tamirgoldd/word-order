@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Word Order icon">
+  <rect width="512" height="512" rx="68" fill="#f3efe5"/>
+  <path d="M256 0h188c37.6 0 68 30.4 68 68v376c0 37.6-30.4 68-68 68H256z" fill="#123d31"/>
+  <path d="M52 72h408v368H52z" fill="none" stroke="#17231f" stroke-width="8"/>
+  <text x="151" y="313" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="178" font-weight="700" fill="#17231f">W</text>
+  <text x="360" y="313" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="178" font-weight="700" fill="#fffdf7">O</text>
+  <rect x="84" y="378" width="344" height="14" fill="#ef5b35"/>
+</svg>

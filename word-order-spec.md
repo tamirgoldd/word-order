@@ -1,4 +1,4 @@
-# Legal-Down — Build Specification
+# Word Order — Build Specification
 
 ## What this is (short version)
 
@@ -23,7 +23,7 @@ A free, open-source, 100% client-side tool that **repairs broken numbering and c
 Monorepo (pnpm workspaces), TypeScript throughout:
 
 ```
-legal-down/
+word-order/
   packages/
     core/        # THE PRODUCT. Pure TS library, zero DOM deps. docx in → docx out.
     cli/         # thin node wrapper around core, for testing & power users
@@ -133,7 +133,7 @@ The UIs render this as a review screen. **Nothing is applied without the plan.**
 
 ## Package: `cli`
 
-`legal-down fix input.docx -o output.docx --report plan.json`. Exists to run the corpus, debug, and let power users script. ~50 lines around core.
+`word-order fix input.docx -o output.docx --report plan.json`. Exists to run the corpus, debug, and let power users script. ~50 lines around core.
 
 ---
 

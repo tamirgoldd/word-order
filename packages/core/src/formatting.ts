@@ -173,7 +173,7 @@ function longParagraphWarnings(inventory: ParagraphInventory[]): PlanWarning[] {
     return [{
       code: "long-paragraph" as const,
       paragraphIndex: paragraph.index,
-      message: `This ${wordCount}-word paragraph has no internal sentence break. Legal Down preserved the wording and flagged it for editorial review.`
+      message: `This ${wordCount}-word paragraph has no internal sentence break. Word Order preserved the wording and flagged it for editorial review.`
     }];
   });
 }

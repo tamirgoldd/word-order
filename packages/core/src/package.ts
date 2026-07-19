@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { LegalDownError } from "./errors.js";
+import { WordOrderError } from "./errors.js";
 
 export interface DocxPackage {
   zip: JSZip;
@@ -15,7 +15,7 @@ export interface DocxPackage {
 
 async function readRequired(zip: JSZip, path: string): Promise<string> {
   const file = zip.file(path);
-  if (!file) throw new LegalDownError("INVALID_DOCX", `The document is missing the required OOXML part ${path}.`);
+  if (!file) throw new WordOrderError("INVALID_DOCX", `The document is missing the required OOXML part ${path}.`);
   return file.async("string");
 }
 
@@ -25,13 +25,13 @@ async function readOptional(zip: JSZip, path: string): Promise<string | null> {
 
 export async function loadDocx(bytes: Uint8Array): Promise<DocxPackage> {
   if (bytes.length < 4 || bytes[0] !== 0x50 || bytes[1] !== 0x4b) {
-    throw new LegalDownError("INVALID_DOCX", "This file is not a valid .docx package.");
+    throw new WordOrderError("INVALID_DOCX", "This file is not a valid .docx package.");
   }
   let zip: JSZip;
   try {
     zip = await JSZip.loadAsync(bytes, { checkCRC32: true });
   } catch {
-    throw new LegalDownError("INVALID_DOCX", "The .docx ZIP package is corrupt or unreadable.");
+    throw new WordOrderError("INVALID_DOCX", "The .docx ZIP package is corrupt or unreadable.");
   }
   const documentXml = await readRequired(zip, "word/document.xml");
   const contentTypesXml = await readRequired(zip, "[Content_Types].xml");

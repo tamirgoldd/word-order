@@ -1,6 +1,6 @@
 # Contributing
 
-Legal Down treats document integrity as the primary feature. Before opening a
+Word Order treats document integrity as the primary feature. Before opening a
 pull request:
 
 1. Add a synthetic fixture that demonstrates the document pattern.

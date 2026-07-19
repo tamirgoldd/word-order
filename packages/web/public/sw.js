@@ -1,4 +1,4 @@
-const CACHE = "legal-down-v2";
+const CACHE = "word-order-v1";
 const SHELL = new URL("./", self.location).href;
 
 self.addEventListener("install", (event) => {

@@ -32,7 +32,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build:pages
         env:
-          BASE_PATH: /legal-down/
+          BASE_PATH: /word-order/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

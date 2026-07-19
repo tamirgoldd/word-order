@@ -1,6 +1,6 @@
 # Security
 
-Legal Down processes documents locally and has no server component. Please do
+Word Order processes documents locally and has no server component. Please do
 not attach confidential documents to public issues.
 
 Report vulnerabilities privately through GitHub's security advisory form. A

@@ -1,16 +1,16 @@
-export type LegalDownErrorCode =
+export type WordOrderErrorCode =
   | "INVALID_DOCX"
   | "TRACKED_CHANGES"
   | "SOURCE_MISMATCH"
   | "CONFIRMATION_REQUIRED"
   | "UNSUPPORTED_DOCUMENT";
 
-export class LegalDownError extends Error {
-  readonly code: LegalDownErrorCode;
+export class WordOrderError extends Error {
+  readonly code: WordOrderErrorCode;
 
-  constructor(code: LegalDownErrorCode, message: string) {
+  constructor(code: WordOrderErrorCode, message: string) {
     super(message);
-    this.name = "LegalDownError";
+    this.name = "WordOrderError";
     this.code = code;
   }
 }

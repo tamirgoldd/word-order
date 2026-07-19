@@ -1,0 +1,41 @@
+name: Bug report
+description: Report a reproducible Word Order problem without sharing confidential documents.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: checkboxes
+    attributes:
+      label: Document safety
+      options:
+        - label: I will not attach a confidential, client, or personal document to this public issue.
+          required: true
+        - label: I tested with a copy of the document and kept the original.
+          required: true
+  - type: dropdown
+    attributes:
+      label: Surface
+      options:
+        - Web app
+        - CLI
+        - Word add-in
+        - Core library
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What happened?
+      description: Describe the expected and actual result. Include the repair-plan summary when useful.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Synthetic reproduction
+      description: Explain the smallest synthetic document pattern that reproduces the problem. Do not upload the original document.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Environment
+      description: Browser or Node version, operating system, and Word version if relevant.
+    validations:
+      required: true
